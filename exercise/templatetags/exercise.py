@@ -207,6 +207,8 @@ def _points_data( # pylint: disable=too-many-locals
                 ):
             data['status'] = obj.status
     else:
+        print("In else")
+        print(obj.get('submissions', None))
         points = obj.get('points', 0)
         max_points = obj.get('max_points', 0)
         required = obj.get('points_to_pass', 0)
@@ -216,6 +218,7 @@ def _points_data( # pylint: disable=too-many-locals
             'max': max_points,
             'difficulty': obj.get('difficulty', ''),
             'required': required,
+            'test': 'Testing',
             'confirm_the_level': obj.get('confirm_the_level', False),
             'missing_points': points < required,
             'passed': obj.get('passed', True),

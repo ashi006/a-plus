@@ -341,6 +341,11 @@ class Submission(UrlMixin, models.Model):
         ('UNOFFICIAL', 'unofficial', _('STATUS_UNOFFICIAL')),
         # unofficial: graded after the deadline or after exceeding the submission limit
     ])
+    UNOFFICAL_STATUS = Enum([
+        ('DEADLINE_PASSED', 'deadline_passed', _('DEADLINE_PASSED')),
+        ('LIMIT_EXCEEDED', 'limit_exceeded', _('LIMIT_EXCEEDED'))
+    ])
+
     submission_time = models.DateTimeField(
         verbose_name=_('LABEL_SUBMISSION_TIME'),
         auto_now_add=True,
@@ -379,6 +384,12 @@ class Submission(UrlMixin, models.Model):
         verbose_name=_('LABEL_STATUS'),
         max_length=32,
         choices=STATUS.choices, default=STATUS.INITIALIZED,
+    )
+    unofficial_status_type = models.CharField(
+        verbose_name=_('LABEL_UNOFFICAL_STATUS_TYPE'),
+        max_length=32,
+        choices=UNOFFICAL_STATUS.choices, default=None,
+        null=True
     )
     grade = models.IntegerField(
         verbose_name=_('LABEL_GRADE'),
@@ -579,8 +590,10 @@ class Submission(UrlMixin, models.Model):
                 adjusted_grade -= (adjusted_grade * self.late_penalty_applied)
             elif timing == exercise.TIMING.UNOFFICIAL:
                 self.status = self.STATUS.UNOFFICIAL
+                self.unofficial_status_type = self.UNOFFICAL_STATUS.DEADLINE_PASSED
             if self.exercise.no_submissions_left(self.submitters.all()):
                 self.status = self.STATUS.UNOFFICIAL
+                self.unofficial_status_type = self.UNOFFICAL_STATUS.LIMIT_EXCEEDED
 
         self.grade = round(adjusted_grade)
 
